@@ -1,0 +1,13 @@
+.legend {
+            padding: 15px 20px;
+            background: #0f3460;
+            border-top: 1px solid #2a2a4a;
+            font-size: 0.85em;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #ccc;
+        }
+        .legend strong {
+            color: #00d2ff;
+        }
