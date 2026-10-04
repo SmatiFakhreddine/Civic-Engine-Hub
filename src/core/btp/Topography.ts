@@ -380,7 +380,7 @@ export class Topography {
         }
         
         const validsX = result.filter(p => p.x !== undefined && p.y !== undefined);
-        typeCheminement === 'ferme' && validsX.splice(0, -1); // Retirer le dernier point pour un cheminement fermé
+        typeCheminement === 'ferme' && validsX.splice(-1); // Retirer le dernier point pour un cheminement fermé
         validsX.sort((a, b) => a.angleGrad! - b.angleGrad!);
         const aTousChampsCotes = result.every(p => p.zBrut !== undefined && p.coteProjet !== undefined);
 
@@ -392,31 +392,38 @@ export class Topography {
               trianglesIndex.push([0, i, i + 1]);
             };
 
+            let surfaceTotale = 0;
+            for (let i = 0; i < n ; i++) {
+                const current = validsX[i];
+                const next = validsX[(i + 1) % n];
+                surfaceTotale += (current.x! * next.y!) - (next.x! * current.y!);
+            };
+            surfaceTotale /= 2;
+            const sensGlobale  = Math.sign(surfaceTotale); // +1 (sens anti horaire) ou -1 (sens horaire)
+
             trianglesIndex.forEach((triangle, idx) => {
                 let somme = 0;
-                let deltaZMoyen = 0;
+                let deltaZ = 0;
                 let surfaceAdj = true;
                 triangle.forEach((pointIndex, i) => {
                     const current = validsX[pointIndex];
-                    const next = i !== triangle.length -1 ? validsX[triangle[i + 1]] : validsX[0];
+                    const next = validsX[triangle[(i + 1) % 3]];
                     somme += (current.x! * next.y!) - (next.x! * current.y!);
-                    deltaZMoyen += ((current.zComp! || current.zBrut!) - current.coteProjet!);
+                    deltaZ += ((current.zComp! || current.zBrut!) - current.coteProjet!);
                 });
 
-                let angle1_0 = Math.atan2((validsX[triangle[1]].y! - validsX[triangle[0]].y!), (validsX[triangle[1]].x! - validsX[triangle[0]].x!));
-                let angle2_0 = Math.atan2((validsX[triangle[2]].y! - validsX[triangle[0]].y!), (validsX[triangle[2]].x! - validsX[triangle[0]].x!));
-                angle1_0 = angle1_0 < 0 ? angle1_0 + 2 * Math.PI : angle1_0;
-                angle2_0 = angle2_0 < 0 ? angle2_0 + 2 * Math.PI : angle2_0;
-                surfaceAdj = angle2_0 > angle1_0 ;
+                const surface = Math.abs(somme);
+                const deltaZMoyen = deltaZ / 3;
+                const volume = surface * deltaZMoyen;
                 
-                const surface = Math.abs(somme) / 2;
-                const deltaZ = deltaZMoyen / 3;
-                const volume = surface * deltaZ;
+                // surfaceAdj = (sensGlobale > 0 && somme > 0) || (sensGlobale < 0 && somme < 0) ;
+                surfaceAdj = (sensGlobale * somme) > 0 ;
+
                 triangles.push({
                     id: idx + 1, 
                     surface: surface, 
                     surfaceAdj: surfaceAdj, 
-                    deltaZMoyen: deltaZ, 
+                    deltaZMoyen: deltaZMoyen, 
                     volume: volume 
                 });
                 surfaceGauss += surfaceAdj ? surface : - surface;

@@ -341,7 +341,7 @@ const TopoDashboard: React.FC<TopoDashboardProps> = ({ isAcademicMode }) => {
                         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="font-black text-slate-800 text-base uppercase tracking-wider">Matrice Commune d'Implantation Spatiale</h3>
-                                <button onClick={addRowSD2} className="bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-blue-700 transition">➕ Insérer Vecteur Parallèle</button>
+                                <button onClick={addRowSD2} className="bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer hover:bg-blue-700 transition">➕ Insérer Vecteur Parallèle</button>
                             </div>
                             <table className="w-full text-left font-mono text-base border-collapse">
                                 <thead>
